@@ -25,6 +25,10 @@ export const TileWithTimeout: React.FunctionComponent<{
     resetTimeout();
   });
 
+  React.useEffect(() => {
+    resetTimeout();
+  }, []);
+
   return (
     <>
       {timeoutReached && <div>Tile timeout</div>}

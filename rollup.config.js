@@ -3,6 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import globals from "rollup-plugin-node-globals";
+import postcss from "rollup-plugin-postcss";
 
 const tsPlugin = () => typescript({
     useTsconfigDeclarationDir: true,
@@ -20,7 +21,8 @@ const serverConfig = {
     plugins: [
         tsPlugin(),
         commonjs(),
-        json()
+        json(),
+        postcss(),
     ]
 }
 
@@ -40,6 +42,7 @@ const clientConfig = {
             preferBuiltins: true
         }),
         globals(),
+        postcss(),
     ],
 }
 

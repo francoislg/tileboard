@@ -37,9 +37,14 @@ app.post("/config", (req, res) => {
 app.post("/update/:id", (req, res) => {
   const id = req.params.id;
   const body = req.body;
+  const value = body.value;
+  const tileToUpdate = configuration.config.tiles.find(tile => tile.id === id);
+  if (tileToUpdate) {
+    tileToUpdate.initialValue = value;
+  }
   io.emit("tile", {
     id,
-    value: body.value,
+    value,
   } as ITileUpdatePayload<any>);
   res.end();
 });

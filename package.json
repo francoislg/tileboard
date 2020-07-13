@@ -5,7 +5,10 @@
   "main": "assets/server.js",
   "scripts": {
     "build": "rollup -c",
-    "start": "npm run build && node assets/server.js"
+    "watch": "rollup -c -w",
+    "start": "concurrently \"npm run watch\" \"npm run watch-server\" ",
+    "run-server": "node assets/server.js",
+    "watch-server": "nodemon assets/server.js"
   },
   "repository": {
     "type": "git",
@@ -37,8 +40,12 @@
     "@types/socket.io": "^2.1.8",
     "@types/socket.io-client": "^1.4.33",
     "bufferutil": "^4.0.1",
+    "concurrently": "^5.2.0",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
     "rollup": "^2.21.0",
     "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-postcss": "^3.1.2",
     "rollup-plugin-typescript2": "^0.27.1",
     "rollup-plugin-uglify": "^6.0.4",
     "typescript": "^3.9.6",

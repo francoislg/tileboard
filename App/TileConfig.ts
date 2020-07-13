@@ -6,5 +6,7 @@ export interface IAppConfig {
 export interface ITileConfig {
     id: string;
     type: string;
+    initialValue?: any;
+    layout?: string;
     props?: any;
 }
