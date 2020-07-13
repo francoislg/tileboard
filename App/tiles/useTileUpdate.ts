@@ -1,21 +1,11 @@
-import { getSocket, ITileUpdatePayload, MessagesTypes } from "../socket";
+import { ITileUpdatePayload } from "../socket";
 import React from "react";
+import { useTileListener } from "../useTileListener";
 
 export const useTileUpdate = <T>(tileId: string, defaultValue: T) => {
     const [value, setValue] = React.useState<T>(defaultValue);
-    React.useEffect(() => {
-        const listener = (payload: ITileUpdatePayload<T>) => {
-            if (payload.id === tileId) {
-                setValue(payload.value);
-            }
-        };
-        const socket = getSocket();
-
-        socket.on(MessagesTypes.TILE_UPDATE, listener);
-        return () => {
-            socket.off(MessagesTypes.TILE_UPDATE, listener)
-        }
+    useTileListener(tileId, (payload: ITileUpdatePayload<T>) => {
+        setValue(payload.value);
     });
-
     return [value, setValue];
 }

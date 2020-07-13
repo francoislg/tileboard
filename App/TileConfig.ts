@@ -1,5 +1,6 @@
 export interface IAppConfig {
-    tiles: ITileConfig[]
+    tiles: ITileConfig[],
+    defaultTimeout?: number;
 }
 
 export interface ITileConfig {

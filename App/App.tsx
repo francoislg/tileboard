@@ -1,8 +1,9 @@
 import React from "react";
 import { getSocket, MessagesTypes, IConfigPayload } from "./socket";
 import { Single } from "./tiles/Single";
-import { ITileConfig } from "./TileConfig";
+import { ITileConfig, IAppConfig } from "./TileConfig";
 import { InvalidType } from "./tiles/InvalidType";
+import { TileWithTimeout } from "./TileWithTimeout";
 
 const tileFactory: {
   [name: string]: React.FunctionComponent<{ id: string }>;
@@ -16,15 +17,19 @@ const tileConfigToElement = (tile: ITileConfig) => {
 };
 
 export const App = () => {
-  const [tiles, setTiles] = React.useState([{
-    id: 'empty',
-    type: 'single'
-  }] as ITileConfig[]);
+  const [config, setConfig] = React.useState<IAppConfig>({
+    tiles: [
+    {
+      id: "empty",
+      type: "single",
+    },
+  ]});
+
+  const {tiles = [], defaultTimeout = 20000} = config;
 
   React.useEffect(() => {
     const listener = (payload: IConfigPayload) => {
-      const tiles = payload?.config?.tiles;
-      setTiles(tiles);
+      payload?.config && setConfig(payload?.config);
     };
     const socket = getSocket();
     socket.on(MessagesTypes.CONFIG, listener);
@@ -36,7 +41,11 @@ export const App = () => {
   return (
     <div>
       {tiles.map((tile) => (
-        <div key={tile.id}>{tileConfigToElement(tile)}</div>
+        <div key={tile.id}>
+          <TileWithTimeout id={tile.id} timeInMs={defaultTimeout}>
+            {tileConfigToElement(tile)}
+          </TileWithTimeout>
+        </div>
       ))}
     </div>
   );
