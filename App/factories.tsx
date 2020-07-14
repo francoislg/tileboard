@@ -1,35 +1,43 @@
 import * as React from "react";
-import { Single } from "./tiles/Single";
 import { Checkbox } from "./tiles/Checkbox";
 import { InvalidType } from "./tiles/InvalidType";
 import { ITileConfig } from "./TileConfig";
-import { SquareTile } from "./layout/SquareTile";
 import { RectangleTile } from "./layout/RectangleTile";
-import { LargeSquareTile } from "./layout/LargeSquareTile";
+import { LabeledList } from "./tiles/LabeledList";
+import { IDefaultLayoutProps } from "./layout/DefaultLayoutProps";
+import { IDefaultTileProps } from "./tiles/DefaultTileProps";
 
 type TileFactory = {
-    [name: string]: React.FunctionComponent<{ id: string, initialValue?: any }>;
+  [name: string]: React.FunctionComponent<IDefaultTileProps<any>>;
 };
 
 const tileFactory: TileFactory = {
-    single: Single,
-    checkbox: Checkbox
+  checkbox: Checkbox,
+  labeledlist: LabeledList,
 };
 
 type LayoutFactory = {
-    [name: string]: React.FunctionComponent<{ id: string }>;
+  [name: string]: React.FunctionComponent<IDefaultLayoutProps>;
 };
 
 const layoutFactory: LayoutFactory = {
-    square: SquareTile,
-    rectangle: RectangleTile,
-    large: LargeSquareTile,
-}
+  square: RectangleTile,
+  rectangle: (props: IDefaultLayoutProps) => (
+    <RectangleTile width={2} {...props} />
+  ),
+  large: (props: IDefaultLayoutProps) => (
+    <RectangleTile width={2} height={2} {...props} />
+  ),
+};
 
-export const getTileElement = (tileType: string) => tileFactory[tileType] || InvalidType;
-export const getLayoutElement = (layout: string) => layoutFactory[layout || 'square'] || layoutFactory.square;
+export const getTileElement = (tileType: string) =>
+  tileFactory[tileType] || InvalidType;
+export const getLayoutElement = (layout: string) =>
+  layoutFactory[layout || "square"] || layoutFactory.square;
 
 export const tileConfigToElement = (tile: ITileConfig) => {
-    const Element = getTileElement(tile.type);
-    return <Element id={tile.id} initialValue={tile.initialValue} {...tile.props} />;
+  const Element = getTileElement(tile.type);
+  return (
+    <Element id={tile.id} initialValue={tile.initialValue} {...tile.props} />
+  );
 };

@@ -6,7 +6,8 @@ export const LayoutWithTimeout: React.FunctionComponent<{
   id: string;
   timeInMs: number;
   layout?: string;
-}> = ({ id, timeInMs, layout, children }) => {
+  layoutProps?: any;
+}> = ({ id, timeInMs, layout, layoutProps, children }) => {
   const [timeoutInstance, setTimeoutInstance] = React.useState<number>();
   const [timeoutReached, setTimeoutReached] = React.useState<boolean>(false);
 
@@ -34,7 +35,7 @@ export const LayoutWithTimeout: React.FunctionComponent<{
   const Layout = getLayoutElement(layout);
 
   return (
-    <Layout id={id}>
+    <Layout tileId={id} {...layoutProps}>
       {timeoutReached && <span>Timeout reached</span>}
       <span style={timeoutReached ? {display: 'none' } : {}}>{children}</span>
     </Layout>

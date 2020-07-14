@@ -8,5 +8,6 @@ export interface ITileConfig {
     type: string;
     initialValue?: any;
     layout?: string;
+    layoutProps?: any;
     props?: any;
 }

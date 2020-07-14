@@ -1,8 +1,16 @@
 import * as React from "react";
-import "./SquareTile.scss";
+import "./RectangleTile.scss";
+import { IDefaultLayoutProps } from "./DefaultLayoutProps";
 
-export const RectangleTile: React.FunctionComponent = ({children}) => (
-    <div className="layout-square rectangle">
-        {children}
-    </div>
-)
+export const RectangleTile: React.FunctionComponent<IDefaultLayoutProps> = ({
+  width = 1,
+  height = 1,
+  children,
+}) => (
+  <div
+    style={{ gridColumnEnd: `span ${width}`, gridRowEnd: `span ${height}` }}
+    className="layout-rectangle"
+  >
+    {children}
+  </div>
+);

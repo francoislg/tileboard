@@ -8,13 +8,14 @@ import "./App.scss";
 export const App = () => {
   const [config, setConfig] = React.useState<IAppConfig>({
     tiles: [
-    {
-      id: "empty",
-      type: "single",
-    },
-  ]});
+      {
+        id: "empty",
+        type: "single",
+      },
+    ],
+  });
 
-  const {tiles = [], defaultTimeout = 120000} = config;
+  const { tiles = [], defaultTimeout = 120000 } = config;
 
   React.useEffect(() => {
     const listener = (payload: IConfigPayload) => {
@@ -30,7 +31,13 @@ export const App = () => {
   return (
     <div className="background container">
       {tiles.map((tile) => (
-        <LayoutWithTimeout key={tile.id} id={tile.id} layout={tile.layout} timeInMs={defaultTimeout}>
+        <LayoutWithTimeout
+          key={tile.id}
+          id={tile.id}
+          layout={tile.layout}
+          layoutProps={tile.layoutProps}
+          timeInMs={defaultTimeout}
+        >
           {tileConfigToElement(tile)}
         </LayoutWithTimeout>
       ))}

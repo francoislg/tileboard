@@ -1,0 +1,24 @@
+.labeled-list-tile {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+
+    > .label {
+        font-size: 1.5em;
+        word-break: break-all;
+    }
+
+    > .list > .item {
+        display: flex;
+
+        .label {
+            width: 50px;
+            text-align: center;
+        }
+        .value {
+
+        }
+    }
+}
