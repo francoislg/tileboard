@@ -1,10 +1,12 @@
 import { useTileListener } from "./useTileListener";
 import * as React from "react";
+import { getLayoutElement } from "./factories";
 
-export const TileWithTimeout: React.FunctionComponent<{
+export const LayoutWithTimeout: React.FunctionComponent<{
   id: string;
   timeInMs: number;
-}> = ({ id, timeInMs, children }) => {
+  layout?: string;
+}> = ({ id, timeInMs, layout, children }) => {
   const [timeoutInstance, setTimeoutInstance] = React.useState<number>();
   const [timeoutReached, setTimeoutReached] = React.useState<boolean>(false);
 
@@ -29,12 +31,12 @@ export const TileWithTimeout: React.FunctionComponent<{
     resetTimeout();
   }, []);
 
+  const Layout = getLayoutElement(layout);
+
   return (
-    <>
-      {timeoutReached && <div>Tile timeout</div>}
-      <span style={{ display: timeoutReached ? "none" : "inline-block" }}>
-        {children}
-      </span>
-    </>
+    <Layout id={id}>
+      {timeoutReached && <span>Timeout reached</span>}
+      <span style={timeoutReached ? {display: 'none' } : {}}>{children}</span>
+    </Layout>
   );
 };

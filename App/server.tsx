@@ -1,11 +1,16 @@
 import { createServer } from "http";
 import { listen } from "socket.io";
+import fs from "fs";
 import Express from "express";
 import React from "react";
 import { App } from "./App";
 import ReactDomServer from "react-dom/server";
 import bodyParser from "body-parser";
-import { IConfigPayload, PORT as SOCKET_PORT, ITileUpdatePayload } from "./socket";
+import {
+  IConfigPayload,
+  PORT as SOCKET_PORT,
+  ITileUpdatePayload,
+} from "./socket";
 
 const app = Express();
 const port = 3000;
@@ -15,30 +20,51 @@ const io = listen(server);
 
 io.listen(SOCKET_PORT);
 
-let configuration: IConfigPayload = { config: { tiles: [] }};
+let configuration: IConfigPayload;
+
+const saveConfiguration = () => {
+  fs.writeFile(
+    "./config.json",
+    JSON.stringify(configuration, null, 2),
+    (err) => !!err && console.error(err)
+  );
+};
+const loadConfiguration = () => {
+  return new Promise((res, rej) => {
+    fs.readFile("./config.json", (err, data) => {
+      let loadedConfig = !!err ? { config: { tiles: [] } } : JSON.parse(data.toString())
+      configuration = loadedConfig;
+      res(loadedConfig);
+    });
+  });
+};
 
 app.use(bodyParser.json());
 
-app.post("/config", (req, res) => {
-  console
-  const body: IConfigPayload['config'] = req.body || {};
+app.post("/config", async (req, res) => {
+  if (!configuration) {
+    await loadConfiguration();
+  }
+  const body: IConfigPayload["config"] = req.body || {};
   configuration = {
     config: {
       ...configuration.config,
       ...body,
-    }
+    },
   } as IConfigPayload;
-  console.log("Updating configuration", configuration)
+  console.log("Updating configuration", configuration);
   io.emit("config", configuration);
+  saveConfiguration();
   res.end();
 });
-
 
 app.post("/update/:id", (req, res) => {
   const id = req.params.id;
   const body = req.body;
   const value = body.value;
-  const tileToUpdate = configuration.config.tiles.find(tile => tile.id === id);
+  const tileToUpdate = configuration.config.tiles.find(
+    (tile) => tile.id === id
+  );
   if (tileToUpdate) {
     tileToUpdate.initialValue = value;
   }
@@ -46,6 +72,7 @@ app.post("/update/:id", (req, res) => {
     id,
     value,
   } as ITileUpdatePayload<any>);
+  saveConfiguration();
   res.end();
 });
 
@@ -79,7 +106,7 @@ console.log(`Listening on port ${port}`);
 io.on("connection", () => {
   console.log("Socket connected");
 
-  io.emit("config", configuration);
+  loadConfiguration().then(config => io.emit("config", config));
 });
 
 app.listen(port);

@@ -1,8 +1,9 @@
 import React from "react";
 import { getSocket, MessagesTypes, IConfigPayload } from "./socket";
 import { IAppConfig } from "./TileConfig";
-import { TileWithTimeout } from "./TileWithTimeout";
+import { LayoutWithTimeout } from "./LayoutWithTimeout";
 import { tileConfigToElement } from "./factories";
+import "./App.scss";
 
 export const App = () => {
   const [config, setConfig] = React.useState<IAppConfig>({
@@ -13,7 +14,7 @@ export const App = () => {
     },
   ]});
 
-  const {tiles = [], defaultTimeout = 20000} = config;
+  const {tiles = [], defaultTimeout = 120000} = config;
 
   React.useEffect(() => {
     const listener = (payload: IConfigPayload) => {
@@ -27,11 +28,11 @@ export const App = () => {
   });
 
   return (
-    <div style={{display: "flex", justifyContent: "space-evenly"}}>
+    <div className="background container">
       {tiles.map((tile) => (
-        <TileWithTimeout key={tile.id} id={tile.id} timeInMs={defaultTimeout}>
+        <LayoutWithTimeout key={tile.id} id={tile.id} layout={tile.layout} timeInMs={defaultTimeout}>
           {tileConfigToElement(tile)}
-        </TileWithTimeout>
+        </LayoutWithTimeout>
       ))}
     </div>
   );
