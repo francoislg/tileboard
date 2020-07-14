@@ -11,6 +11,8 @@ import {
   PORT as SOCKET_PORT,
   ITileUpdatePayload,
 } from "./socket";
+import lockFile from "lockfile";
+import util from "util";
 
 const app = Express();
 const port = 3000;
@@ -21,22 +23,43 @@ const io = listen(server);
 io.listen(SOCKET_PORT);
 
 let configuration: IConfigPayload;
+const defaultConfiguration: IConfigPayload = { config: { tiles: [] } };
 
-const saveConfiguration = () => {
-  fs.writeFile(
-    "./config.json",
-    JSON.stringify(configuration, null, 2),
-    (err) => !!err && console.error(err)
-  );
+const lock = util.promisify(lockFile.lock);
+const unlock = util.promisify(lockFile.unlock);
+const writeFile = util.promisify(fs.writeFile);
+const readFile = util.promisify(fs.readFile);
+
+const file = "./config.json";
+const saveConfiguration = async () => {
+  try {
+    await lock(file + ".lock");
+  } catch (err) {
+    // Try again later.
+    setTimeout(saveConfiguration, 5000);
+    return;
+  }
+
+  console.log("Saving configuration");
+
+  await writeFile(file,  JSON.stringify(configuration, null, 2));
+  await unlock(file + ".lock");
 };
-const loadConfiguration = () => {
-  return new Promise((res, rej) => {
-    fs.readFile("./config.json", (err, data) => {
-      let loadedConfig = !!err ? { config: { tiles: [] } } : JSON.parse(data.toString())
-      configuration = loadedConfig;
-      res(loadedConfig);
-    });
-  });
+const tryParseJsonOrDefault = (data: string) => {
+  try {
+    return JSON.parse(data);
+  } catch {
+    return defaultConfiguration;
+  }
+}
+const loadConfiguration = async () => {
+  try {
+    const data = await readFile(file);
+    configuration = tryParseJsonOrDefault(data.toString());
+  } catch (err) {
+    configuration = defaultConfiguration;
+  }
+  return configuration;
 };
 
 app.use(bodyParser.json());
@@ -54,11 +77,11 @@ app.post("/config", async (req, res) => {
   } as IConfigPayload;
   console.log("Updating configuration", configuration);
   io.emit("config", configuration);
-  saveConfiguration();
+  await saveConfiguration();
   res.end();
 });
 
-app.post("/update/:id", (req, res) => {
+app.post("/update/:id", async (req, res) => {
   const id = req.params.id;
   const body = req.body;
   const value = body.value;
@@ -72,7 +95,7 @@ app.post("/update/:id", (req, res) => {
     id,
     value,
   } as ITileUpdatePayload<any>);
-  saveConfiguration();
+  await saveConfiguration();
   res.end();
 });
 
