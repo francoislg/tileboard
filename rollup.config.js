@@ -4,6 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import globals from "rollup-plugin-node-globals";
 import postcss from "rollup-plugin-postcss";
+import injectProcessEnv from "rollup-plugin-inject-process-env";
 
 const tsPlugin = () => typescript({
     useTsconfigDeclarationDir: true,
@@ -43,6 +44,9 @@ const clientConfig = {
         }),
         globals(),
         postcss(),
+        injectProcessEnv({
+            SOCKET_PORT: process.env.SOCKET_PORT || 7273,
+        }),
     ],
 }
 
