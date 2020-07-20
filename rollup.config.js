@@ -8,7 +8,7 @@ import injectProcessEnv from "rollup-plugin-inject-process-env";
 
 const tsPlugin = () => typescript({
     useTsconfigDeclarationDir: true,
-    rollupCommonJSResolveHack: true
+    rollupCommonJSResolveHack: true,
 })
 
 const serverConfig = {

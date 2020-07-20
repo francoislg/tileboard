@@ -61,9 +61,8 @@ const renderFullPage = (html: string) => {
 `;
 };
 
-const bearerRegex = /Bearer (.+)/g;
 const isValidBearer = (apiKey: string): boolean => {
-  const matches = bearerRegex.exec(apiKey);
+  const matches = `${apiKey}`.match(/Bearer (.+)/);
   return !!matches && matches.length > 0 && matches[1] === API_KEY;
 }
 

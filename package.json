@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple server that renders tiles with a configuration API",
   "bin": "assets/server.js",
+  "types": "assets/types/types.d.ts",
   "scripts": {
     "build": "rollup -c",
     "run-server": "node assets/server.js",

@@ -6,9 +6,12 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "assets/types",
         "jsx": "react"
     },
     "exclude": [
+        "assets/**/*.*",
         "**/*.spec.ts"
     ]
 }
