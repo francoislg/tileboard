@@ -2,9 +2,10 @@
 import io from "socket.io-client";
 import { IAppConfig } from "./TileConfig";
 
-export const PORT = process.env.SOCKET_PORT || 7273;
+export const SOCKET_URL = globalThis.location?.origin?.split(":").slice(0, 2) || "http://0.0.0.0";
+export const SOCKET_PORT = 7273;
 let socket: ReturnType<typeof io>;
-export const getSocket = () => socket || (socket = io(`http://localhost:${PORT}`));
+export const getSocket = () => socket || (socket = io(`${SOCKET_URL}:${SOCKET_PORT}`));
 export const MessagesTypes = {
     CONFIG: 'config',
     TILE_UPDATE: 'tile'

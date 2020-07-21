@@ -7,12 +7,7 @@ import "./App.scss";
 
 export const App = () => {
   const [config, setConfig] = React.useState<IAppConfig>({
-    tiles: [
-      {
-        id: "empty",
-        type: "single",
-      },
-    ],
+    tiles: [],
   });
 
   const { tiles = [], defaultTimeout = 120000 } = config;

@@ -7,6 +7,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm run build
+
 EXPOSE 7272 7273
 
-CMD [ "npm", "run", "server" ]
+CMD [ "npm", "run", "run-server" ]

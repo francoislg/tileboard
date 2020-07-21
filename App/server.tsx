@@ -8,7 +8,7 @@ import ReactDomServer from "react-dom/server";
 import bodyParser from "body-parser";
 import {
   IConfigPayload,
-  PORT as SOCKET_PORT,
+  SOCKET_PORT,
   ITileUpdatePayload,
 } from "./socket";
 import lockFile from "lockfile";
@@ -21,8 +21,8 @@ if (!API_KEY) {
 }
 
 const app = Express();
-const HOST = "0.0.0.0";
-const PORT = 7272;
+const HOST = process.env.SERVER_HOST || "0.0.0.0";
+const PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT) : 7272;
 
 const server = createServer(app);
 const io = listen(server);
