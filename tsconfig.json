@@ -12,6 +12,7 @@
     },
     "exclude": [
         "assets/**/*.*",
-        "**/*.spec.ts"
+        "**/*.spec.ts",
+        "config.json"
     ]
 }

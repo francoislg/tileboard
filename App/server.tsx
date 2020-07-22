@@ -20,6 +20,14 @@ if (!API_KEY) {
   throw "You must provide the API_KEY environment variable to run this server.";
 }
 
+const debounce = <T extends any[] | []>(f: (...args: T) => any, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: T) => {
+    !!timeout && clearTimeout(timeout);
+    timeout = setTimeout(() => f(...args), wait);
+  };
+};
+
 const app = Express();
 const HOST = process.env.SERVER_HOST || "0.0.0.0";
 const PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT) : 7272;
@@ -87,7 +95,7 @@ const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 
 const file = "./config.json";
-const saveConfiguration = async () => {
+const saveConfiguration = debounce(async () => {
   try {
     await lock(file + ".lock");
   } catch (err) {
@@ -100,7 +108,7 @@ const saveConfiguration = async () => {
 
   await writeFile(file,  JSON.stringify(configuration, null, 2));
   await unlock(file + ".lock");
-};
+}, 2000);
 const tryParseJsonOrDefault = (data: string) => {
   try {
     return JSON.parse(data);
@@ -126,7 +134,6 @@ app.post("/config", async (req, res) => {
       ...body,
     },
   } as IConfigPayload;
-  console.log("Updating configuration", configuration);
   io.emit("config", configuration);
   await saveConfiguration();
   res.end();

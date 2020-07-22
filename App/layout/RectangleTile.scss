@@ -2,7 +2,10 @@
 @import "./Sizes.scss";
 
 .layout-rectangle {
+    position: relative;
+
     height: 100%;
+    width: 100%;
     grid-row-end: span 1;
 
     background-color: #25282d;
@@ -12,6 +15,8 @@
     justify-content: center;
     flex-direction: column;
 
+    overflow: hidden;
+
     &.rectangle {
         grid-column-end: span 2;
     }
@@ -19,5 +24,11 @@
     &.large {
         grid-column-end: span 2;
         grid-row-end: span 2;
+    }
+
+    > .content {
+        flex: 1;
+
+        display: flex;
     }
 }

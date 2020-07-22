@@ -6,6 +6,7 @@ export interface IAppConfig {
 export interface ITileConfig {
     id: string;
     type: string;
+    title?: string;
     initialValue?: any;
     layout?: string;
     layoutProps?: any;

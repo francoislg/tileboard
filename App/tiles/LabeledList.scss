@@ -5,12 +5,7 @@
     align-items: center;
     justify-content: space-evenly;
 
-    > .label {
-        font-size: 1.5em;
-        word-break: break-all;
-    }
-
-    > .list > .item {
+    > .item {
         display: flex;
 
         .label {

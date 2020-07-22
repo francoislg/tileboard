@@ -29,6 +29,7 @@ export const App = () => {
         <LayoutWithTimeout
           key={tile.id}
           id={tile.id}
+          title={tile.title}
           layout={tile.layout}
           layoutProps={tile.layoutProps}
           timeInMs={defaultTimeout}

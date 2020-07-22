@@ -8,24 +8,19 @@ export type LabeledListItem = {
   value: string;
 };
 
-export const LabeledList: React.FunctionComponent<
-  IDefaultTileProps<LabeledListItem[]> & {
-    label?: string;
-  }
-> = ({ id, initialValue, label }) => {
+export const LabeledList: React.FunctionComponent<IDefaultTileProps<
+  LabeledListItem[]
+>> = ({ id, initialValue }) => {
   const [values, _] = useTileUpdate<LabeledListItem[]>(id, initialValue || []);
 
   return (
     <div className="labeled-list-tile">
-      {!!label && <div className="label">{label}</div>}
-      <div className="list">
-        {values.map(({ label, value }) => (
-          <div className="item" key={label}>
-            <div className="label">{label}</div>
-            <div className="value">{value}</div>
-          </div>
-        ))}
-      </div>
+      {values.map(({ label, value }) => (
+        <div className="item" key={label}>
+          <div className="label">{label}</div>
+          <div className="value">{value}</div>
+        </div>
+      ))}
     </div>
   );
 };

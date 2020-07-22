@@ -9,7 +9,7 @@
     "run-server": "node assets/server.js",
     "server": "npm run build && npm run run-server",
     "watch-build": "rollup -c -w",
-    "watch-server": "nodemon assets/server.js",
+    "watch-server": "nodemon --watch assets assets/server.js",
     "start": "concurrently \"npm run watch-build\" \"npm run watch-server\""
   },
   "repository": {
