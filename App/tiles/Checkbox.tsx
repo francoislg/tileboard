@@ -2,6 +2,7 @@ import React from "react";
 import { useTileUpdate } from "./useTileUpdate";
 import "./Checkbox.scss";
 import { IDefaultTileProps } from "./DefaultTileProps";
+import { EmojiCheckbox } from "./components/EmojiCheckbox";
 
 export const Checkbox: React.FunctionComponent<IDefaultTileProps<boolean>> = ({
   id,
@@ -9,13 +10,9 @@ export const Checkbox: React.FunctionComponent<IDefaultTileProps<boolean>> = ({
 }) => {
   const [value, _] = useTileUpdate<boolean | undefined>(id, initialValue);
 
-  const valueAsString = `${value}`;
-
   return (
     <div className="checkbox-tile">
-      {valueAsString === "true" && "✔️"}
-      {valueAsString === "false" && "🔴"}
-      {valueAsString !== "true" && valueAsString !== "false" && "❓"}
+      <EmojiCheckbox value={value} />
     </div>
   );
 };

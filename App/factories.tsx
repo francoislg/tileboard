@@ -6,6 +6,7 @@ import { RectangleTile } from "./layout/RectangleTile";
 import { LabeledList } from "./tiles/LabeledList";
 import { IDefaultLayoutProps } from "./layout/DefaultLayoutProps";
 import { IDefaultTileProps } from "./tiles/DefaultTileProps";
+import { CheckboxMatrix } from "./tiles/CheckboxMatrix";
 
 type TileFactory = {
   [name: string]: React.FunctionComponent<IDefaultTileProps<any>>;
@@ -14,6 +15,7 @@ type TileFactory = {
 const tileFactory: TileFactory = {
   checkbox: Checkbox,
   labeledlist: LabeledList,
+  checkboxMatrix: CheckboxMatrix,
 };
 
 type LayoutFactory = {
