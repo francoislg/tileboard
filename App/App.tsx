@@ -4,6 +4,7 @@ import { IAppConfig } from "./TileConfig";
 import { LayoutWithTimeout } from "./LayoutWithTimeout";
 import { tileConfigToElement } from "./factories";
 import "./App.scss";
+import { ConfigContextProvider } from "./useConfigContext";
 
 export const App = () => {
   const [config, setConfig] = React.useState<IAppConfig>({
@@ -24,13 +25,13 @@ export const App = () => {
   });
 
   return (
+    <ConfigContextProvider value={config}>
     <div className="background container" style={{gridAutoFlow: direction}}>
       {tiles.map((tile) => (
         <LayoutWithTimeout
           key={tile.id}
           id={tile.id}
           title={tile.title}
-          appConfig={config}
           layout={tile.layout}
           layoutProps={tile.layoutProps}
           timeInMs={defaultTimeout}
@@ -39,5 +40,6 @@ export const App = () => {
         </LayoutWithTimeout>
       ))}
     </div>
+    </ConfigContextProvider>
   );
 };
