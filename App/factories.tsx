@@ -15,7 +15,7 @@ type TileFactory = {
 const tileFactory: TileFactory = {
   checkbox: Checkbox,
   labeledlist: LabeledList,
-  checkboxMatrix: CheckboxMatrix,
+  checkboxmatrix: CheckboxMatrix,
 };
 
 type LayoutFactory = {
@@ -33,9 +33,9 @@ const layoutFactory: LayoutFactory = {
 };
 
 export const getTileElement = (tileType: string) =>
-  tileFactory[tileType] || InvalidType;
+  tileFactory[tileType?.toLowerCase()] || InvalidType;
 export const getLayoutElement = (layout: string) =>
-  layoutFactory[layout || "square"] || layoutFactory.square;
+  layoutFactory[layout?.toLowerCase() || "square"] || layoutFactory.square;
 
 export const tileConfigToElement = (tile: ITileConfig) => {
   const Element = getTileElement(tile.type);

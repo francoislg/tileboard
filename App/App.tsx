@@ -11,7 +11,7 @@ export const App = () => {
     tiles: [],
   });
 
-  const { tiles = [], defaultTimeout = 120000, direction = 'row' } = config;
+  const { tiles = [], defaultTimeout = 120000, direction = "row" } = config;
 
   React.useEffect(() => {
     const listener = (payload: IConfigPayload) => {
@@ -26,20 +26,20 @@ export const App = () => {
 
   return (
     <ConfigContextProvider value={config}>
-    <div className="background container" style={{gridAutoFlow: direction}}>
-      {tiles.map((tile) => (
-        <LayoutWithTimeout
-          key={tile.id}
-          id={tile.id}
-          title={tile.title}
-          layout={tile.layout}
-          layoutProps={tile.layoutProps}
-          timeInMs={defaultTimeout}
-        >
-          {tileConfigToElement(tile)}
-        </LayoutWithTimeout>
-      ))}
-    </div>
+      <div className="background container" style={{ gridAutoFlow: direction }}>
+        {tiles.map((tile) => (
+          <LayoutWithTimeout
+            key={tile.id}
+            id={tile.id}
+            title={tile.title}
+            layout={tile.layout}
+            layoutProps={tile.layoutProps}
+            timeInMs={defaultTimeout}
+          >
+            {tileConfigToElement(tile)}
+          </LayoutWithTimeout>
+        ))}
+      </div>
     </ConfigContextProvider>
   );
 };

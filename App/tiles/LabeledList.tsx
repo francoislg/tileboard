@@ -6,6 +6,7 @@ import { IDefaultTileProps } from "./DefaultTileProps";
 export type LabeledListItem = {
   label: string;
   value: string;
+  footer?: string;
 };
 
 export const LabeledList: React.FunctionComponent<IDefaultTileProps<
@@ -15,10 +16,11 @@ export const LabeledList: React.FunctionComponent<IDefaultTileProps<
 
   return (
     <div className="labeled-list-tile">
-      {values.map(({ label, value }) => (
+      {values.map(({ label, value, footer }) => (
         <div className="item" key={label}>
-          <div className="label">{label}</div>
+          {!!label && <div className="label">{label}</div>}
           <div className="value">{value}</div>
+          {!!footer && <div className="footer">{footer}</div>}
         </div>
       ))}
     </div>

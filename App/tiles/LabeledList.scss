@@ -7,13 +7,19 @@
 
     > .item {
         display: flex;
+        width: 100%;
+        flex-wrap: wrap;
 
         .label {
-            width: 50px;
-            text-align: center;
+            flex: 1;
         }
         .value {
+            flex: 1
+        }
 
+        .footer {
+            font-size: 0.5em;
+            flex-basis: 100%;
         }
     }
 }
