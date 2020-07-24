@@ -10,7 +10,7 @@ export const App = () => {
     tiles: [],
   });
 
-  const { tiles = [], defaultTimeout = 120000 } = config;
+  const { tiles = [], defaultTimeout = 120000, direction = 'row' } = config;
 
   React.useEffect(() => {
     const listener = (payload: IConfigPayload) => {
@@ -24,12 +24,13 @@ export const App = () => {
   });
 
   return (
-    <div className="background container">
+    <div className="background container" style={{gridAutoFlow: direction}}>
       {tiles.map((tile) => (
         <LayoutWithTimeout
           key={tile.id}
           id={tile.id}
           title={tile.title}
+          appConfig={config}
           layout={tile.layout}
           layoutProps={tile.layoutProps}
           timeInMs={defaultTimeout}

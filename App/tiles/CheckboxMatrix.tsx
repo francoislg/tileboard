@@ -22,13 +22,13 @@ export const CheckboxMatrix: React.FunctionComponent<
         gridTemplateRows: `1fr repeat(${rowLabels.length}, 1fr)`,
       }}
     >
-      <div></div>
-      {columnLabels.map(column => <div>{column}</div>)}
+      <div className="row column"></div>
+      {columnLabels.map(column => <div className="column">{column}</div>)}
       {rowLabels.map((row, rowIndex) => (<>
-          <div>{row}</div>
+          <div className="row">{row}</div>
           {columnLabels.map((_, colIndex) => (
              <>
-             <div><EmojiCheckbox value={values?.[rowIndex]?.[colIndex]} /></div>
+             <div className="cell"><EmojiCheckbox value={values?.[rowIndex]?.[colIndex]} /></div>
            </>
           ))}
         </>

@@ -1,6 +1,7 @@
 export interface IAppConfig {
     tiles: ITileConfig[],
     defaultTimeout?: number;
+    direction?: 'column' | 'row';
 }
 
 export interface ITileConfig {

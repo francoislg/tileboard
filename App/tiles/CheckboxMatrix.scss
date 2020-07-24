@@ -1,10 +1,25 @@
 .checkbox-matrix-tile {
     display: grid;
     grid-gap: 5px;
-    padding: 5px;
+    padding: 10px;
+    flex: 1;
 
     > div {
         grid-column-end: span 1;
         grid-row-end: span 1;
+        display: flex;
+
+        &.row {
+            align-items: center;
+        }
+
+        &.column {
+            justify-content: center;
+        }
+
+        &.cell {
+            align-items: center;
+            justify-content: center;
+        }
     }
 }
