@@ -19,8 +19,10 @@ export const LabeledList: React.FunctionComponent<IDefaultTileProps<
       {values.map(({ label, value, footer }) => (
         <div className="item" key={label}>
           {!!label && <div className="label">{label}</div>}
-          <div className="value">{value}</div>
-          {!!footer && <div className="footer">{footer}</div>}
+          <div className="value">
+            <div>{value}</div>
+            {!!footer && <div className="footer">{footer}</div>}
+          </div>
         </div>
       ))}
     </div>
