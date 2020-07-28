@@ -2,9 +2,9 @@ import React from "react";
 import { useTileUpdate } from "./useTileUpdate";
 import "./CheckboxMatrix.scss";
 import { IDefaultTileProps } from "./DefaultTileProps";
-import { EmojiCheckbox } from "./components/EmojiCheckbox";
+import { EmojiCheckbox, ICheckboxValue } from "./components/EmojiCheckbox";
 
-export type CheckboxMatrixItems = boolean[][];
+export type CheckboxMatrixItems = ICheckboxValue[][];
 
 export const CheckboxMatrix: React.FunctionComponent<
   IDefaultTileProps<CheckboxMatrixItems> & {
