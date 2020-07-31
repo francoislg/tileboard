@@ -17,7 +17,7 @@ export const EmojiCheckbox: React.FunctionComponent<{
   return (
     <span className="checkbox">
       <LinkWrapper>
-        {value === "true" && "✔️"}
+        {value === "true" && "✅"}
         {value === "false" && "🔴"}
         {value !== "true" && value !== "false" && "❓"}
       </LinkWrapper>
