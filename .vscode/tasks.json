@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "start",
+            "type": "npm",
+            "script": "start",
+            "isBackground": true,
+            "options": {
+                "env": {
+                    "API_KEY": "abc"
+                }
+            },
+            "problemMatcher":  [{
+                "base": "$tsc-watch",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "^.+bundles.+$"
+                    },
+                    "endsPattern": {
+                        "regexp": "^\\[1\\] Listening on .+$"
+                    }
+                }
+            }]
+        }
+    ]
+}

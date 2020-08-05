@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "localhost:7272/dashboard",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "start",
+        }
+    ]
+}
