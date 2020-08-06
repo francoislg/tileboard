@@ -34,6 +34,7 @@ export const App = () => {
             title={tile.title}
             layout={tile.layout}
             layoutProps={tile.layoutProps}
+            defaultLastTimestamp={tile.lastTimestamp}
             timeInMs={defaultTimeout}
           >
             {tileConfigToElement(tile)}

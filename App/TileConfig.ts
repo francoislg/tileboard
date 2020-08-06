@@ -1,5 +1,5 @@
 export interface IAppConfig {
-    tiles: ITileConfig[],
+    tiles: Array<ITileConfig & ITileState<unknown>>,
     defaultTimeout?: number;
     direction?: 'column' | 'row';
 }
@@ -12,4 +12,10 @@ export interface ITileConfig {
     layout?: string;
     layoutProps?: any;
     props?: any;
+}
+
+export interface ITileState<T> {
+    id: string;
+    value: T;
+    lastTimestamp: number;
 }

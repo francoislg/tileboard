@@ -1,6 +1,6 @@
 
 import io from "socket.io-client";
-import { IAppConfig } from "./TileConfig";
+import { IAppConfig, ITileState } from "./TileConfig";
 
 export const SOCKET_URL = `http://${globalThis.location?.hostname || "0.0.0.0"}`;
 export const SOCKET_PORT = 7273;
@@ -13,7 +13,4 @@ export const MessagesTypes = {
 export interface IConfigPayload {
     config: IAppConfig;
 }
-export interface ITileUpdatePayload<T> {
-    id: string;
-    value: T;
-}
+export type ITileUpdatePayload<T> = ITileState<T>;

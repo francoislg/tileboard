@@ -7,12 +7,12 @@ import { App } from "./App";
 import ReactDomServer from "react-dom/server";
 import bodyParser from "body-parser";
 import {
-  IConfigPayload,
   SOCKET_PORT,
   ITileUpdatePayload,
 } from "./socket";
 import lockFile from "lockfile";
 import util from "util";
+import { ITileConfig, ITileState, IAppConfig } from "./TileConfig";
 
 const API_KEY = process.env.API_KEY;
 
@@ -86,8 +86,11 @@ app.use(async (req, res, next) => {
   }
 })
 
-let configuration: IConfigPayload;
-const defaultConfiguration: IConfigPayload = { config: { tiles: [] } };
+type IStorageConfig = {
+  config: IAppConfig;
+}
+let configuration: IStorageConfig;
+const defaultConfiguration: IStorageConfig = { config: { tiles: [] } };
 
 const lock = util.promisify(lockFile.lock);
 const unlock = util.promisify(lockFile.unlock);
@@ -127,13 +130,13 @@ const loadConfiguration = async () => {
 };
 
 app.post("/config", async (req, res) => {
-  const body: IConfigPayload["config"] = req.body || {};
+  const body: IStorageConfig["config"] = req.body || {};
   configuration = {
     config: {
       ...configuration.config,
       ...body,
     },
-  } as IConfigPayload;
+  } as IStorageConfig;
   io.emit("config", configuration);
   await saveConfiguration();
   res.end();
@@ -143,16 +146,20 @@ app.post("/update/:id", async (req, res) => {
   const id = req.params.id;
   const body = req.body;
   const value = body.value;
+  const timestamp = Date.now();
   const tileToUpdate = configuration.config.tiles.find(
     (tile) => tile.id === id
   );
   if (tileToUpdate) {
     tileToUpdate.initialValue = value;
+    tileToUpdate.lastTimestamp = timestamp;
   }
-  io.emit("tile", {
+  const payload: ITileUpdatePayload<any> = {
     id,
     value,
-  } as ITileUpdatePayload<any>);
+    lastTimestamp: timestamp
+  }
+  io.emit("tile", payload);
   await saveConfiguration();
   res.end();
 });

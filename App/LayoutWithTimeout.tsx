@@ -1,7 +1,7 @@
-import { useTileListener } from "./useTileListener";
 import * as React from "react";
 import { getLayoutElement } from "./factories";
 import "./LayoutWithTimeout.scss";
+import { useTileLastUpdateTimestamp } from "./useTileLastUpdateTimestamp";
 
 export const LayoutWithTimeout: React.FunctionComponent<{
   id: string;
@@ -9,30 +9,29 @@ export const LayoutWithTimeout: React.FunctionComponent<{
   title: string;
   layout?: string;
   layoutProps?: any;
-}> = ({ id, timeInMs, title, layout, layoutProps, children }) => {
+  defaultLastTimestamp?: number;
+}> = ({ id, timeInMs, defaultLastTimestamp, title, layout, layoutProps, children }) => {
+  const [lastUpdate] = useTileLastUpdateTimestamp(id, defaultLastTimestamp || Date.now());
   const [timeoutInstance, setTimeoutInstance] = React.useState<number>();
   const [timeoutReached, setTimeoutReached] = React.useState<boolean>(false);
-
-  const resetTimeout = React.useCallback(() => {
-    setTimeoutReached(false);
-    const instance = self.setTimeout(() => {
-      setTimeoutReached(true);
-    }, timeInMs);
-    setTimeoutInstance(instance);
-  }, [timeInMs]);
 
   const clearTimeout = React.useCallback(() => {
     self.clearTimeout(timeoutInstance);
   }, [timeoutInstance]);
 
-  useTileListener(id, () => {
-    clearTimeout();
-    resetTimeout();
-  });
-
   React.useEffect(() => {
-    resetTimeout();
-  }, []);
+    clearTimeout();
+    const timeUntilTimeout = lastUpdate ? Math.max((lastUpdate + timeInMs) - Date.now(), 0) : 0;
+    if (timeUntilTimeout === 0) {
+      setTimeoutReached(true);
+    } else {
+      setTimeoutReached(false);
+      const instance = self.setTimeout(() => {
+        setTimeoutReached(true);
+      }, timeUntilTimeout);
+      setTimeoutInstance(instance);
+    }
+  }, [timeInMs, lastUpdate]);
 
   const Layout = getLayoutElement(layout);
 
