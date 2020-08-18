@@ -1,14 +1,35 @@
-.checkbox {
+.checkbox-container {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .link {
+    height: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  &.true {
+    background-color: green;
+  }
+
+  &.false {
+    background-color: darkred;
+  }
+
+  .checkbox {
     position: relative;
 
-    .link {
-        text-decoration: none;
-    }
-
     .updating {
-        position: absolute;
-        top: 0;
-        left: 0;
-        font-size: 0.5em;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 0.5em;
     }
+  }
 }

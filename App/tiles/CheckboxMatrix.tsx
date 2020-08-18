@@ -10,8 +10,9 @@ export const CheckboxMatrix: React.FunctionComponent<
   IDefaultTileProps<CheckboxMatrixItems> & {
     columnLabels: string[];
     rowLabels: string[];
+    coloredBackground?: boolean
   }
-> = ({ id, columnLabels, rowLabels, initialValue }) => {
+> = ({ id, columnLabels, rowLabels, coloredBackground, initialValue }) => {
   const [values, _] = useTileUpdate<CheckboxMatrixItems>(id, initialValue || []);
 
   return (
@@ -28,7 +29,7 @@ export const CheckboxMatrix: React.FunctionComponent<
           <div className="row">{row}</div>
           {columnLabels.map((_, colIndex) => (
              <>
-             <div className="cell"><EmojiCheckbox value={values?.[rowIndex]?.[colIndex]} /></div>
+             <div className="cell"><EmojiCheckbox value={values?.[rowIndex]?.[colIndex]} coloredBackground={coloredBackground} /></div>
            </>
           ))}
         </>

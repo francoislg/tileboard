@@ -5,38 +5,54 @@ export type ICheckboxConfiguration = {
   value: undefined | boolean | string;
   link?: string;
   isUpdating?: boolean;
+  coloredBackground?: boolean;
 };
 export type ICheckboxValue = boolean | ICheckboxConfiguration;
-
-export const EmojiCheckbox: React.FunctionComponent<{
+export interface IEmojiCheckboxProps {
   value?: ICheckboxValue;
-}> = ({ value: checkboxValue }) => {
-  const { value, link, isUpdating } = extractConfigFromValue(checkboxValue);
+  coloredBackground?: boolean;
+}
+
+export const EmojiCheckbox: React.FunctionComponent<IEmojiCheckboxProps> = (
+  props
+) => {
+  const { value, link, isUpdating, coloredBackground } = extractConfigFromProps(
+    props
+  );
   const LinkWrapper: React.FunctionComponent = link
-    ? ({ children }) => <a href={link} target="_blank" className="link">{children}</a>
+    ? ({ children }) => (
+        <a href={link} target="_blank" className="link">
+          {children}
+        </a>
+      )
     : ({ children }) => <>{children}</>;
   return (
-    <span className="checkbox">
+    <div className={`checkbox-container ${coloredBackground ? value : ""}`}>
       <LinkWrapper>
-        {isUpdating && <span className="updating">⌛</span>}
-        {value === "true" && "👍"}
-        {value === "false" && "🔴"}
-        {value !== "true" && value !== "false" && "❓"}
+        <div className="checkbox">
+          {isUpdating && <span className="updating">⌛</span>}
+          {value === "true" && "👍"}
+          {value === "false" && "🔴"}
+          {value !== "true" && value !== "false" && "❓"}
+        </div>
       </LinkWrapper>
-    </span>
+    </div>
   );
 };
 
-const extractConfigFromValue = (
-  checkbox: ICheckboxValue
-): ICheckboxConfiguration => {
+const extractConfigFromProps = ({
+  value: checkbox,
+  coloredBackground,
+}: IEmojiCheckboxProps): ICheckboxConfiguration => {
   if (typeof checkbox === "object") {
     return {
+      coloredBackground,
       ...checkbox,
       value: `${checkbox.value}`,
     };
   } else {
     return {
+      coloredBackground,
       value: `${checkbox}`,
     };
   }
