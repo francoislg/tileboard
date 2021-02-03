@@ -96,12 +96,25 @@ const lock = util.promisify(lockFile.lock);
 const unlock = util.promisify(lockFile.unlock);
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
+const mkdir = util.promisify(fs.mkdir);
 
-const file = "./config.json";
+const file = "./data/config.json";
 const saveConfiguration = debounce(async () => {
+  console.log("Trying to save configuration");
+  try {
+    await mkdir("./data");
+  } catch (err) {
+    // Ignore if the directory already exist.
+    const DIR_ALREADY_EXIST_CODE = -17;
+    if (err.errno !== DIR_ALREADY_EXIST_CODE) {
+      throw err;
+    }
+  }
+
   try {
     await lock(file + ".lock");
   } catch (err) {
+    console.error(err);
     // Try again later.
     setTimeout(saveConfiguration, 5000);
     return;
@@ -111,6 +124,8 @@ const saveConfiguration = debounce(async () => {
 
   await writeFile(file,  JSON.stringify(configuration, null, 2));
   await unlock(file + ".lock");
+
+  console.log("Configuration saved properly.")
 }, 2000);
 const tryParseJsonOrDefault = (data: string) => {
   try {
