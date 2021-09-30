@@ -1,18 +1,28 @@
 {
+    "compileOnSave": false,
     "compilerOptions": {
-        "module": "ES6",
+        "target": "ESNext",
+        "strict": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "strictPropertyInitialization": false,
         "noImplicitAny": true,
+        "allowUnreachableCode": false,
         "allowSyntheticDefaultImports": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "declaration": true,
-        "declarationDir": "assets/types",
-        "jsx": "react"
+        "emitDecoratorMetadata": true,
+        "typeRoots": [
+            "node_modules/@types/",
+            "src/@types/"
+        ],
+        "baseUrl": "./App"
     },
+    "include": [
+        "./App"
+    ],
     "exclude": [
-        "assets/**/*.*",
-        "**/*.spec.ts",
-        "config.json"
-    ]
+        "./node_modules",
+        "./dist"
+    ],
+    "extends": "@tsconfig/svelte/tsconfig.json"
 }

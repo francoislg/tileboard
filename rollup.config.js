@@ -1,17 +1,13 @@
-import typescript from 'rollup-plugin-typescript2';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import autoPreprocess from "svelte-preprocess";
+import resolve from '@rollup/plugin-node-resolve';
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
-import globals from "rollup-plugin-node-globals";
 import postcss from "rollup-plugin-postcss";
-
-const tsPlugin = () => typescript({
-    useTsconfigDeclarationDir: true,
-    rollupCommonJSResolveHack: true,
-})
+import svelte from "rollup-plugin-svelte";
 
 const serverConfig = {
-    input: './App/server.tsx',
+    input: './App/server.ts',
     output: [{
         file: "./assets/server.js",
         format: 'umd',
@@ -19,30 +15,39 @@ const serverConfig = {
         sourcemap: true,
     }],
     plugins: [
-        tsPlugin(),
+        svelte({
+            preprocess: autoPreprocess(),
+        }),
+        typescript(),
+        postcss(),
         commonjs(),
         json(),
-        postcss(),
     ]
 }
 
 const clientConfig = {
-    input: './App/client.tsx',
+    input: './App/client.ts',
     output: [{
         file: "./assets/client.js",
-        format: 'umd',
-        name: 'tipboard-client',
+        format: 'iife',
+        name: 'tipboardclient',
         sourcemap: true,
     }],
     plugins: [
-        tsPlugin(),
-        commonjs(),
-        nodeResolve({
-            browser: true,
-            preferBuiltins: true
+        svelte({
+            preprocess: autoPreprocess(),
+            exclude: ["ws"]
         }),
-        globals(),
+        typescript({
+            sourceMap: true
+        }),
+        resolve({
+            browser: true,
+            dedupe: ['svelte']
+        }),
+        commonjs(),
         postcss(),
+        json(),
     ],
 }
 

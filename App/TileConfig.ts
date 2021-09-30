@@ -4,16 +4,17 @@ export interface IAppConfig {
     direction?: 'column' | 'row';
 }
 
-export interface ITileConfig {
+// Component props are sent with the configuration. Those should be used to configure a tile
+export interface ITileConfig<TProps = undefined> {
     id: string;
     type: string;
-    title?: string;
-    initialValue?: any;
+    title?: string
     layout?: string;
     layoutProps?: any;
-    props?: any;
+    props: TProps;
 }
 
+// A tile state is changing often and can be updated individually.
 export interface ITileState<T> {
     id: string;
     value: T;

@@ -1,18 +1,12 @@
-import { createServer } from "http";
-import { listen } from "socket.io";
 import fs from "fs";
 import Express from "express";
-import React from "react";
-import { App } from "./App";
-import ReactDomServer from "react-dom/server";
 import bodyParser from "body-parser";
-import {
-  SOCKET_PORT,
-  ITileUpdatePayload,
-} from "./socket";
-import lockFile from "lockfile";
-import util from "util";
-import { ITileConfig, ITileState, IAppConfig } from "./TileConfig";
+import { SOCKET_PORT } from "./socket";
+import * as lockFile from "lockfile";
+import { promisify } from "util";
+import type { IAppConfig } from "./TileConfig";
+import { WebSocketServer, WebSocket } from "ws";
+import type { ITileUpdatePayload } from "./payloads";
 
 const API_KEY = process.env.API_KEY;
 
@@ -20,7 +14,10 @@ if (!API_KEY) {
   throw "You must provide the API_KEY environment variable to run this server.";
 }
 
-const debounce = <T extends any[] | []>(f: (...args: T) => any, wait: number) => {
+const debounce = <T extends any[] | []>(
+  f: (...args: T) => any,
+  wait: number
+) => {
   let timeout: NodeJS.Timeout;
   return (...args: T) => {
     !!timeout && clearTimeout(timeout);
@@ -32,78 +29,99 @@ const app = Express();
 const HOST = process.env.SERVER_HOST || "0.0.0.0";
 const PORT = process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT) : 7272;
 
-const server = createServer(app);
-const io = listen(server);
+const wss = new WebSocketServer({ port: SOCKET_PORT });
+wss.on("connection", (client) => {
+  console.log("Socket connected");
 
-io.listen(SOCKET_PORT);
+  loadConfiguration().then((config) =>
+    client.send(
+      JSON.stringify({
+        type: "config",
+        ...config,
+      })
+    )
+  );
+});
+
+function emitToAll(type: string, data: any) {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({
+        type,
+        ...data,
+      }))
+    }
+  })
+}
 
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
-  next()
-})
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+});
 
 //Serve static files
 app.use("/assets", Express.static("assets"));
 
 app.use("/dashboard", (req, res) => {
-  // Render the component to a string
-  const html = ReactDomServer.renderToString(<App />);
-
-  res.send(renderFullPage(html));
+  res.send(renderFullPage());
 });
 
-const renderFullPage = (html: string) => {
+const renderFullPage = () => {
   return `<!DOCTYPE html>
     <html>
       <head>
         <title>Tileboard</title>
+
       </head>
       <body>
-        <div id="root">${html}</div>
+        <div id="root"></div>
         <script src="/assets/client.js"></script>
       </body>
     </html>
 `;
 };
 
-const isValidBearer = (apiKey: string): boolean => {
+const isValidBearer = (apiKey?: string): apiKey is string  => {
   const matches = `${apiKey}`.match(/Bearer (.+)/);
   return !!matches && matches.length > 0 && matches[1] === API_KEY;
-}
+};
 
 app.use(async (req, res, next) => {
-  const apiKey = req.get('Authorization');
+  const apiKey = req.get("Authorization");
   if (!isValidBearer(apiKey)) {
-    res.status(401).json({error: 'unauthorised'});
+    res.status(401).json({ error: "unauthorised" });
   } else {
     if (!configuration) {
       await loadConfiguration();
     }
-    next()
+    next();
   }
-})
+});
 
 type IStorageConfig = {
   config: IAppConfig;
-}
+};
 let configuration: IStorageConfig;
 const defaultConfiguration: IStorageConfig = { config: { tiles: [] } };
 
-const lock = util.promisify(lockFile.lock);
-const unlock = util.promisify(lockFile.unlock);
-const writeFile = util.promisify(fs.writeFile);
-const readFile = util.promisify(fs.readFile);
-const mkdir = util.promisify(fs.mkdir);
+const lock = promisify(lockFile.lock);
+const unlock = promisify(lockFile.unlock);
+const writeFile = promisify(fs.writeFile);
+const readFile = promisify(fs.readFile);
+const mkdir = promisify(fs.mkdir);
 
 const file = "./data/config.json";
 const saveConfiguration = debounce(async () => {
   console.log("Trying to save configuration");
   try {
     await mkdir("./data");
-  } catch (err) {
+  } catch (err: any) {
     // Ignore if the directory already exist.
     const DIR_ALREADY_EXIST_CODE = -17;
     if (err.errno !== DIR_ALREADY_EXIST_CODE) {
@@ -122,10 +140,10 @@ const saveConfiguration = debounce(async () => {
 
   console.log("Saving configuration");
 
-  await writeFile(file,  JSON.stringify(configuration, null, 2));
+  await writeFile(file, JSON.stringify(configuration, null, 2));
   await unlock(file + ".lock");
 
-  console.log("Configuration saved properly.")
+  console.log("Configuration saved properly.");
 }, 2000);
 const tryParseJsonOrDefault = (data: string) => {
   try {
@@ -133,7 +151,7 @@ const tryParseJsonOrDefault = (data: string) => {
   } catch {
     return defaultConfiguration;
   }
-}
+};
 const loadConfiguration = async () => {
   try {
     const data = await readFile(file);
@@ -152,7 +170,7 @@ app.post("/config", async (req, res) => {
       ...body,
     },
   } as IStorageConfig;
-  io.emit("config", configuration);
+  emitToAll("config", configuration);
   await saveConfiguration();
   res.end();
 });
@@ -166,26 +184,19 @@ app.post("/update/:id", async (req, res) => {
     (tile) => tile.id === id
   );
   if (tileToUpdate) {
-    tileToUpdate.initialValue = value;
+    tileToUpdate.value = value;
     tileToUpdate.lastTimestamp = timestamp;
   }
   const payload: ITileUpdatePayload<any> = {
     id,
     value,
-    lastTimestamp: timestamp
-  }
-  io.emit("tile", payload);
+    lastTimestamp: timestamp,
+  };
+  emitToAll("tile", payload);
   await saveConfiguration();
   res.end();
 });
 
-
 console.log(`Listening on ${HOST}:${PORT}`);
 
-io.on("connection", () => {
-  console.log("Socket connected");
-
-  loadConfiguration().then(config => io.emit("config", config));
-});
-
-app.listen(PORT, HOST);
+app.listen(PORT);
