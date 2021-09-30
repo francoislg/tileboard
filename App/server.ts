@@ -44,14 +44,16 @@ wss.on("connection", (client) => {
 });
 
 function emitToAll(type: string, data: any) {
-  wss.clients.forEach(client => {
+  wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({
-        type,
-        ...data,
-      }))
+      client.send(
+        JSON.stringify({
+          type,
+          ...data,
+        })
+      );
     }
-  })
+  });
 }
 
 app.use(bodyParser.json());
@@ -87,7 +89,7 @@ const renderFullPage = () => {
 `;
 };
 
-const isValidBearer = (apiKey?: string): apiKey is string  => {
+const isValidBearer = (apiKey?: string): apiKey is string => {
   const matches = `${apiKey}`.match(/Bearer (.+)/);
   return !!matches && matches.length > 0 && matches[1] === API_KEY;
 };
@@ -168,6 +170,15 @@ app.post("/config", async (req, res) => {
     config: {
       ...configuration.config,
       ...body,
+      ...(body?.tiles && body?.tiles.length > 0
+        ? {
+            tiles: body.tiles.map((tile) => ({
+              ...(configuration?.config?.tiles?.find((t) => t.id === tile.id) ||
+                {}),
+              ...tile,
+            })),
+          }
+        : {}),
     },
   } as IStorageConfig;
   emitToAll("config", configuration);
