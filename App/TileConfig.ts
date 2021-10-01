@@ -1,5 +1,6 @@
 export interface IAppConfig {
-    tiles: Array<ITileConfig & ITileState<unknown>>,
+    pagesConfig?: Array<Partial<IAppConfig>>;
+    tiles: Array<ITileConfig & ITileState<unknown>>;
     defaultTimeout?: number;
     direction?: 'column' | 'row';
 }
@@ -8,11 +9,13 @@ export interface IAppConfig {
 export interface ITileConfig<TProps = undefined> {
     id: string;
     type: string;
+    key?: string;
     title?: string
     layout?: string;
     layoutProps?: any;
     props: TProps;
     timeout?: number;
+    page?: number;
 }
 
 // A tile state is changing often and can be updated individually.

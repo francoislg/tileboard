@@ -3,6 +3,12 @@ import type { IConfigPayload, ITileUpdatePayload } from "./payloads";
 import { createSocket } from "./socket";
 import type { IAppConfig } from "./TileConfig";
 
+const initialPage = window.location.hash.substring(1).split("&").map(a => a.split("=")).find(([key]) => key === 'page')?.[1] || "1";
+
+export const currentPage = writable<number>(parseInt(initialPage));
+
+currentPage.subscribe((page) => window.location.hash = `#page=${page}`)
+
 export const appState = writable<IAppConfig>({
   tiles: [],
 });

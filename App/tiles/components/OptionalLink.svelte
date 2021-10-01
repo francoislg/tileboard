@@ -18,5 +18,6 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
+    color: inherit;
   }
 </style>

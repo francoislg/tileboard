@@ -41,10 +41,8 @@
 
     background-color: #25282d;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: min-content 1fr;
 
     overflow: hidden;
   }
@@ -59,8 +57,7 @@
   }
 
   .content {
-    flex: 1;
     display: flex;
-    width: 100%;
+    overflow: auto;
   }
 </style>

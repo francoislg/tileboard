@@ -2,19 +2,30 @@
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
   import LayoutWithTimeout from "./LayoutWithTimeout.svelte";
+  import PageControls from "./PageControls.svelte";
 
-  import { appState, startSocket } from "./stores";
+  import { appState, currentPage, startSocket } from "./stores";
   import Checkbox from "./tiles/Checkbox.svelte";
   import CheckboxMatrix from "./tiles/CheckboxMatrix.svelte";
   import InvalidType from "./tiles/InvalidType.svelte";
   import LabeledList from "./tiles/LabeledList.svelte";
   import LineChart from "./tiles/LineChart.svelte";
+  import ScrumPanel from "./tiles/ScrumPanel.svelte";
 
-  const tiles = derived(appState, (state) => state?.tiles || []);
-  const direction = derived(appState, (state) => state?.direction || "column");
+  const tiles = derived(
+    [appState, currentPage],
+    ([state, page]) =>
+      state?.tiles?.filter((tile) => (tile.page || 1) === page) || []
+  );
+  const direction = derived(
+    [appState, currentPage],
+    ([state, page]) =>
+       state?.pagesConfig?.[page - 1]?.direction || state?.direction || "column"
+  );
   const defaultTimeout = derived(
-    appState,
-    (state) => state?.defaultTimeout || 120000
+    [appState, currentPage],
+    ([state, page]) =>
+       state?.pagesConfig?.[page - 1]?.defaultTimeout || state?.defaultTimeout || 120000
   );
 
   onMount(() => {
@@ -23,7 +34,7 @@
 </script>
 
 <div class="background container {$direction}">
-  {#each $tiles as { id, title, type, layout, layoutProps, lastTimestamp, timeout }}
+  {#each $tiles as { id, key, title, type, layout, layoutProps, lastTimestamp, timeout } (key || id)}
     <LayoutWithTimeout
       {title}
       {layout}
@@ -39,11 +50,14 @@
         <CheckboxMatrix {id} />
       {:else if type.toLowerCase() === "linechart"}
         <LineChart {id} />
+      {:else if type.toLowerCase() === "scrumpanel"}
+        <ScrumPanel {id} />
       {:else}
         <InvalidType />
       {/if}
     </LayoutWithTimeout>
   {/each}
+  <PageControls />
 </div>
 
 <style>
@@ -59,7 +73,7 @@
     font-family: "misolight", "Trebuchet MS", Arial, sans-serif;
   }
 
-  * {
+  :global(*) {
     box-sizing: border-box;
   }
 
