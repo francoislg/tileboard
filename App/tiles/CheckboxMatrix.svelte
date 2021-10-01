@@ -36,7 +36,7 @@
       <div class="cell">
         <EmojiCheckbox
           checkbox={$state?.[rowIndex]?.[colIndex] || { value: undefined }}
-          {coloredBackground}
+          coloredBackground={$coloredBackground}
         />
       </div>
     {/each}

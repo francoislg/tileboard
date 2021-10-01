@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-import { derived } from "svelte/store";
+  import { derived } from "svelte/store";
   import LayoutWithTimeout from "./LayoutWithTimeout.svelte";
 
   import { appState, startSocket } from "./stores";
@@ -8,10 +8,14 @@ import { derived } from "svelte/store";
   import CheckboxMatrix from "./tiles/CheckboxMatrix.svelte";
   import InvalidType from "./tiles/InvalidType.svelte";
   import LabeledList from "./tiles/LabeledList.svelte";
+  import LineChart from "./tiles/LineChart.svelte";
 
-  const tiles = derived(appState, state => state?.tiles || []);
-  const direction = derived(appState, state => state?.direction || "column");
-  const defaultTimeout = derived(appState, state => state?.defaultTimeout || 120000);
+  const tiles = derived(appState, (state) => state?.tiles || []);
+  const direction = derived(appState, (state) => state?.direction || "column");
+  const defaultTimeout = derived(
+    appState,
+    (state) => state?.defaultTimeout || 120000
+  );
 
   onMount(() => {
     startSocket();
@@ -19,13 +23,13 @@ import { derived } from "svelte/store";
 </script>
 
 <div class="background container {$direction}">
-  {#each $tiles as { id, title, type, layout, layoutProps, lastTimestamp }}
+  {#each $tiles as { id, title, type, layout, layoutProps, lastTimestamp, timeout }}
     <LayoutWithTimeout
       {title}
       {layout}
       {layoutProps}
       {lastTimestamp}
-      timeInMs={$defaultTimeout}
+      timeInMs={timeout || $defaultTimeout}
     >
       {#if type.toLowerCase() === "labeledlist"}
         <LabeledList {id} />
@@ -33,6 +37,8 @@ import { derived } from "svelte/store";
         <Checkbox {id} />
       {:else if type.toLowerCase() === "checkboxmatrix"}
         <CheckboxMatrix {id} />
+      {:else if type.toLowerCase() === "linechart"}
+        <LineChart {id} />
       {:else}
         <InvalidType />
       {/if}

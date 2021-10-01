@@ -5,6 +5,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import postcss from "rollup-plugin-postcss";
 import svelte from "rollup-plugin-svelte";
+import replace from '@rollup/plugin-replace';
 
 const serverConfig = {
     input: './App/server.ts',
@@ -26,6 +27,7 @@ const serverConfig = {
 }
 
 const clientConfig = {
+    context: 'window',
     input: './App/client.ts',
     output: [{
         file: "./assets/client.js",
@@ -36,6 +38,10 @@ const clientConfig = {
     plugins: [
         svelte({
             preprocess: autoPreprocess(),
+            compilerOptions: {
+                dev: true,
+                sourcemap: true,
+            },
             exclude: ["ws"]
         }),
         typescript({
@@ -45,6 +51,10 @@ const clientConfig = {
             browser: true,
             dedupe: ['svelte']
         }),
+        replace({
+			preventAssignment: true,
+			'process.env.NODE_ENV': JSON.stringify('production'),
+		}),
         commonjs(),
         postcss(),
         json(),

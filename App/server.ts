@@ -168,14 +168,15 @@ app.post("/config", async (req, res) => {
   const body: IStorageConfig["config"] = req.body || {};
   configuration = {
     config: {
-      ...configuration.config,
       ...body,
       ...(body?.tiles && body?.tiles.length > 0
         ? {
             tiles: body.tiles.map((tile) => ({
-              ...(configuration?.config?.tiles?.find((t) => t.id === tile.id) ||
-                {}),
               ...tile,
+              value:
+                tile.value ||
+                configuration?.config?.tiles?.find((t) => t.id === tile.id)
+                  ?.value,
             })),
           }
         : {}),

@@ -12,6 +12,7 @@ export interface ITileConfig<TProps = undefined> {
     layout?: string;
     layoutProps?: any;
     props: TProps;
+    timeout?: number;
 }
 
 // A tile state is changing often and can be updated individually.
