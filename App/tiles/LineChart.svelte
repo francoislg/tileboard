@@ -2,7 +2,7 @@
   import { createTileStores } from "../stores";
   import * as Pancake from "@sveltejs/pancake";
   import { derived } from "svelte/store";
-import LabeledList from "./LabeledList.svelte";
+  import LabeledList from "./LabeledList.svelte";
 
   interface LineChartProps {
     labels?: string[];
@@ -27,10 +27,11 @@ import LabeledList from "./LabeledList.svelte";
 
   const data = derived([props, state], ([p, s]) => ({
     labels: s?.labels || p?.labels || [],
-    datasets: s?.datasets?.map((dataset, index) => ({
-      ...dataset,
-      color: dataset?.color || COLOR_ROTATION[index % COLOR_ROTATION.length],
-    })) || [],
+    datasets:
+      s?.datasets?.map((dataset, index) => ({
+        ...dataset,
+        color: dataset?.color || COLOR_ROTATION[index % COLOR_ROTATION.length],
+      })) || [],
   }));
 
   const computed = derived(data, (d) =>
@@ -48,7 +49,6 @@ import LabeledList from "./LabeledList.svelte";
       )
   );
 
-
   const minx = 0;
   const maxx = $data.labels.length - 1;
 
@@ -57,67 +57,69 @@ import LabeledList from "./LabeledList.svelte";
   };
 </script>
 
-<div class="chart">
-  <Pancake.Chart x1={minx} x2={maxx} y1={0} y2={$computed.max}>
-    <Pancake.Grid horizontal count={5} let:value let:last>
-      {#if value !== 0}<div class="grid-line horizontal">
-          <span>{value}</span>
-        </div>{/if}
-    </Pancake.Grid>
+{#key $data.labels.length}
+  <div class="chart">
+    <Pancake.Chart x1={minx} x2={maxx} y1={0} y2={$computed.max}>
+      <Pancake.Grid horizontal count={5} let:value let:last>
+        {#if value !== 0}<div class="grid-line horizontal">
+            <span>{value}</span>
+          </div>{/if}
+      </Pancake.Grid>
 
-    <Pancake.Grid vertical count={5} let:value>
-      <div class="grid-line vertical" />
+      {#if $data?.labels?.length > 0}
+        <Pancake.Grid vertical count={5} let:value>
+          <div class="grid-line vertical" />
 
-      <span class="date-label">
-        {$data?.labels?.[value]?.substring(5, 10)}
-      </span>
-    </Pancake.Grid>
+          <span class="date-label">
+            {$data?.labels?.[value]?.substring(5, 10)}
+          </span>
+        </Pancake.Grid>
+      {/if}
 
-    <Pancake.Svg>
+      <Pancake.Svg>
+        {#each $data.datasets as { color, values }, index}
+          <Pancake.SvgLine
+            data={values.map((v, index) => ({ value: v, index }))}
+            x={(d) => d.index}
+            y={(d) => d.value}
+            let:d
+          >
+            <path stroke={color} class="trend" {d} />
+          </Pancake.SvgLine>
+        {/each}
+      </Pancake.Svg>
+
+      <div class="legend">
+        {#each $data.datasets as { color, name }}
+          <div style="color: {color};">{name}</div>
+        {/each}
+      </div>
+
       {#each $data.datasets as { color, values }, index}
-        <Pancake.SvgLine
+        <Pancake.Quadtree
           data={values.map((v, index) => ({ value: v, index }))}
           x={(d) => d.index}
           y={(d) => d.value}
-          let:d
+          let:closest
         >
-          <path
-            stroke={color}
-            class="trend"
-            {d}
-          />
-        </Pancake.SvgLine>
+          {#if closest}
+            <Pancake.Point x={closest.index} y={closest.value} let:d>
+              <div class="focus" />
+              <div
+                class="tooltip"
+                style="color: {color}; transform: translate(-{pc(
+                  closest.index
+                )}%,0)"
+              >
+                <strong>{Math.floor(closest.value)}</strong>
+              </div>
+            </Pancake.Point>
+          {/if}
+        </Pancake.Quadtree>
       {/each}
-    </Pancake.Svg>
-
-    <div class="legend">
-      {#each $data.datasets as { color, name }}
-        <div style="color: {color};">{name}</div>
-      {/each}
-    </div>
-
-    {#each $data.datasets as { color, values }, index}
-      <Pancake.Quadtree
-        data={values.map((v, index) => ({ value: v, index }))}
-        x={(d) => d.index}
-        y={(d) => d.value}
-        let:closest
-      >
-        {#if closest}
-          <Pancake.Point x={closest.index} y={closest.value} let:d>
-            <div class="focus" />
-            <div
-              class="tooltip"
-              style="color: {color}; transform: translate(-{pc(closest.index)}%,0)"
-            >
-              <strong>{Math.floor(closest.value)}</strong>
-            </div>
-          </Pancake.Point>
-        {/if}
-      </Pancake.Quadtree>
-    {/each}
-  </Pancake.Chart>
-</div>
+    </Pancake.Chart>
+  </div>
+{/key}
 
 <style>
   .chart {

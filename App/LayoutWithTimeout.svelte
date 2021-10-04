@@ -13,14 +13,18 @@
   let timeoutReached = false;
 
   function resetTimeout() {
+    clearTimeout(timeoutInstance);
     const timeUntilTimeout = lastTimestamp
       ? Math.max(lastTimestamp + timeInMs - Date.now(), 0)
       : 0;
-    timeoutReached = false;
-    clearTimeout(timeoutInstance);
-    timeoutInstance = globalThis.setTimeout(() => {
+    if (timeUntilTimeout <= 0) {
       timeoutReached = true;
-    }, timeUntilTimeout);
+    } else {
+      timeoutReached = false;
+      timeoutInstance = globalThis.setTimeout(() => {
+        timeoutReached = true;
+      }, timeUntilTimeout);
+    }
   }
 
   const specificLayoutProps: {
