@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { text } from "svelte/internal";
   import { createTileStores } from "../stores";
   import OptionalLink from "./components/OptionalLink.svelte";
 
@@ -10,7 +9,7 @@
   interface Card {
     title: string;
     link?: string;
-    type?: "story" | "bug";
+    type?: "story" | "bug" | "doc";
     epic?: string;
     points?: number;
     color?: string;
@@ -28,6 +27,12 @@
     cards: Array<Array<Card>>;
   };
 
+  const typeToText = {
+    story: "",
+    bug: "🐛 ",
+    doc: "📔 ",
+  };
+
   export let id: string;
 
   const { getProps, getState } = createTileStores(id);
@@ -43,7 +48,7 @@
     <div>
       <header>{label}</header>
       <div class="list">
-        {#each $state?.cards?.[index] || [] as { title, link, epic, points, assigned, color, tags }}
+        {#each $state?.cards?.[index] || [] as { title, link, type, epic, points, assigned, color, tags }}
           <div class="card">
             <OptionalLink {link}>
               <div class="card-content">
@@ -53,7 +58,10 @@
                       <img src={assigned.image} alt="assigned" />
                     {/if}
                   </div>
-                  <div class="title">{title}</div>
+                  <div class="title">
+                    {#if type}{typeToText[type]}{/if}
+                    {title}
+                  </div>
                   <div class="points">
                     {#if points}{points} {/if}
                   </div>
